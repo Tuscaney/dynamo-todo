@@ -23,7 +23,7 @@ DynamoDB Table Screenshot
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/Tuscaney/dynamo-todo
+git clone https://github.com/Tuscaney/dynamo-todo.git
 cd dynamo-todo
 
 
