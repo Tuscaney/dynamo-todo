@@ -12,7 +12,10 @@ Check out the live site: [Dynamo Todo on Netlify](https://dynamo-todo-demo.netli
 
 ## Table Screenshot
 
-![DynamoDB Table Screenshot](docs/demo.png)
+DynamoDB Table Screenshot
+
+<img width="1299" height="323" alt="dynamoDB Table" src="https://github.com/user-attachments/assets/0fdff9e4-fd61-4e38-af5c-5b44219ec395" />
+
 
 ---
 
