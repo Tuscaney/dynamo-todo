@@ -24,3 +24,13 @@ const ddb = DynamoDBDocumentClient.from(baseClient, {
   },
 });
 
+export async function scanTodos() {
+  const resp = await ddb.send(new ScanCommand({ TableName: TABLE_NAME }));
+  return resp.Items ?? [];
+}
+
+export async function createTodo(item) {
+  await ddb.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
+  return item;
+}
+
