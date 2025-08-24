@@ -1,6 +1,6 @@
 // src/App.jsx
 import { useEffect, useState } from "react";
-import { scanTodos, createTodo } from "./dynamo";
+import { scanTodos, createTodo, toggleTodo, deleteTodo } from "./dynamo";
 
 export default function App() {
   const [todos, setTodos] = useState([]);
@@ -8,9 +8,9 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
-  // show the region for quick verification in the UI/console
   const region = import.meta.env.VITE_AWS_REGION;
 
+  // Load todos on mount
   useEffect(() => {
     (async () => {
       try {
@@ -20,19 +20,20 @@ export default function App() {
         setTodos(items);
       } catch (err) {
         console.error("scanTodos failed:", err);
-        // user-friendly hint
-        alert("Failed to load todos. Check .env.local, IAM policy, and table name.");
+        alert(
+          "Failed to load todos. Check .env.local, IAM policy, and table name."
+        );
       } finally {
         setLoading(false);
       }
     })();
   }, [region]);
 
+  // Add a new todo
   async function onAdd() {
     const trimmed = text.trim();
     if (!trimmed) return;
 
-    // id generator: prefer crypto.randomUUID when available
     const id =
       typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
         ? crypto.randomUUID()
@@ -40,21 +41,45 @@ export default function App() {
 
     const newItem = { id, text: trimmed, completed: false };
 
-    // optimistic UI update
-    setTodos((prev) => [newItem, ...prev]);
+    setTodos(prev => [newItem, ...prev]);
     setText("");
     setBusy(true);
 
     try {
       await createTodo(newItem);
-      // createTodo returns item if you want to use it
     } catch (err) {
       console.error("createTodo failed:", err);
-      alert("Create failed. Reverting UI. See console for details.");
-      setTodos((prev) => prev.filter((t) => t.id !== id));
+      alert("Create failed. Reverting UI.");
+      setTodos(prev => prev.filter(t => t.id !== id));
       setText(trimmed);
     } finally {
       setBusy(false);
+    }
+  }
+
+  // Toggle completed
+  async function onToggle(id, completed) {
+    setTodos(prev => prev.map(t => (t.id === id ? { ...t, completed } : t)));
+    try {
+      await toggleTodo(id, completed);
+    } catch (err) {
+      console.error("toggleTodo failed:", err);
+      alert("Failed to update. Reloading todos.");
+      const items = await scanTodos();
+      setTodos(items);
+    }
+  }
+
+  // Delete a todo
+  async function onDelete(id) {
+    setTodos(prev => prev.filter(t => t.id !== id));
+    try {
+      await deleteTodo(id);
+    } catch (err) {
+      console.error("deleteTodo failed:", err);
+      alert("Delete failed. Reloading todos.");
+      const items = await scanTodos();
+      setTodos(items);
     }
   }
 
@@ -68,7 +93,7 @@ export default function App() {
       <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
         <input
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={e => setText(e.target.value)}
           placeholder="Enter a todo and press Add"
           style={{ flex: 1, padding: "8px 10px", fontSize: 16 }}
         />
@@ -85,10 +110,31 @@ export default function App() {
         <p>No todos yet. Add one above.</p>
       ) : (
         <ul style={{ paddingLeft: 18 }}>
-          {todos.map((t) => (
-            <li key={t.id} style={{ margin: "10px 0" }}>
-              <span style={{ fontWeight: 600 }}>{t.text}</span>{" "}
-              <span style={{ color: "#666" }}>— completed: {String(t.completed)}</span>
+          {todos.map(t => (
+            <li
+              key={t.id}
+              style={{
+                margin: "10px 0",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={t.completed}
+                onChange={() => onToggle(t.id, !t.completed)}
+              />
+              <span
+                style={{
+                  fontWeight: 600,
+                  textDecoration: t.completed ? "line-through" : "none",
+                  flex: 1,
+                }}
+              >
+                {t.text}
+              </span>
+              <button onClick={() => onDelete(t.id)}>Delete</button>
             </li>
           ))}
         </ul>
@@ -96,3 +142,8 @@ export default function App() {
     </div>
   );
 }
+
+
+
+
+
