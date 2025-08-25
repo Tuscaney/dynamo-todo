@@ -1,5 +1,5 @@
 {
-  "name": "dynamo-todo",
+  "name": "styled-todo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.868.0",
-    "@aws-sdk/lib-dynamodb": "^3.868.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
@@ -24,6 +22,8 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
-    "vite": "^7.1.3"
+    "sass": "^1.90.0",
+    "sass-embedded": "^1.90.0",
+    "vite": "^7.1.2"
   }
 }
