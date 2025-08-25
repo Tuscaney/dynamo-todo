@@ -44,5 +44,27 @@ cd dynamo-todo
 4. Delete a todo by clicking the Delete button.
 
 
+## Week 5 Day 1 Assignment
 
+SCSS for styling, and deployed on Vercel.
+
+## Features
+
+Add, toggle, and delete todos stored in DynamoDB.
+
+Styled with SCSS using variables and nesting.
+
+Displays AWS region in use.
+
+Fully responsive and ready to deploy.
+
+## Tech Stack
+
+React 18 + Vite
+
+SCSS for styling
+
+AWS DynamoDB (via AWS SDK v3)
+
+Vercel for deployment
 
