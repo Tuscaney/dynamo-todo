@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 export default function App() {
   const [todos, setTodos] = useState([]);
@@ -21,6 +22,20 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const region = import.meta.env.VITE_AWS_REGION;
+
+  // MUI theme based on SCSS colors
+  const theme = createTheme({
+    palette: {
+      primary: { main: "#1e90ff" },   // matches $primary
+      secondary: { main: "#ff7f50" }, // matches $secondary
+      success: { main: "#32cd32" },   // matches $accent
+      info: { main: "#ffd700" },      // matches $highlight
+      background: { default: "#f0f0f0" }, // matches $muted
+    },
+    typography: {
+      fontFamily: "system-ui",
+    },
+  });
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -81,77 +96,94 @@ export default function App() {
   };
 
   return (
-    <div className="app-container" style={{ padding: "2rem" }}>
-      <Typography variant="h3" gutterBottom>
-        DynamoDB TODOs
-      </Typography>
-      <Typography variant="subtitle1" gutterBottom>
-        Region: <code>{region}</code>
-      </Typography>
+    <ThemeProvider theme={theme}>
+      <div className="app-container" style={{ padding: "2rem" }}>
+        <Typography variant="h3" gutterBottom color="primary">
+          DynamoDB TODOs
+        </Typography>
+        <Typography variant="subtitle1" gutterBottom color="secondary">
+          Region: <code>{region}</code>
+        </Typography>
 
-      {/* Input row */}
-      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
-        <TextField
-          label="Enter todo"
-          variant="outlined"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          disabled={busy}
-          fullWidth
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={onAdd}
-          disabled={busy || !text.trim()}
-          startIcon={<AddIcon />}
-        >
-          {busy ? "Adding..." : "Add"}
-        </Button>
-      </div>
-
-      <hr />
-
-      {/* Todo list */}
-      {loading ? (
-        <Typography>Loading todos…</Typography>
-      ) : todos.length === 0 ? (
-        <Typography>No todos yet.</Typography>
-      ) : (
-        todos.map((t) => (
-          <Card
-            key={t.id}
-            style={{ marginBottom: "1rem", background: t.completed ? "#f0f0f0" : "#fff" }}
+        {/* Input row */}
+        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+          <TextField
+            label="Enter todo"
+            variant="outlined"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            disabled={busy}
+            fullWidth
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={onAdd}
+            disabled={busy || !text.trim()}
+            startIcon={<AddIcon />}
           >
-            <CardContent style={{ display: "flex", alignItems: "center" }}>
-              <Checkbox
-                checked={t.completed}
-                onChange={() => onToggle(t.id, !t.completed)}
-                color="primary"
-              />
-              <Typography
-                variant="body1"
-                style={{
-                  textDecoration: t.completed ? "line-through" : "none",
-                  flexGrow: 1,
-                }}
-              >
-                {t.text}
-              </Typography>
-              <IconButton
-                edge="end"
-                color="error"
-                onClick={() => onDelete(t.id)}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </CardContent>
-          </Card>
-        ))
-      )}
-    </div>
+            {busy ? "Adding..." : "Add"}
+          </Button>
+          {/* Secondary button demo */}
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => alert("Secondary Action")}
+            sx={{
+    "&:focus": { outline: "none" },  // removes the black outline on focus
+  }}
+          >
+            Secondary Action
+          </Button>
+        </div>
+
+        <hr />
+
+        {/* Todo list */}
+        {loading ? (
+          <Typography>Loading todos…</Typography>
+        ) : todos.length === 0 ? (
+          <Typography>No todos yet.</Typography>
+        ) : (
+          todos.map((t) => (
+            <Card
+              key={t.id}
+              style={{
+                marginBottom: "1rem",
+                background: t.completed ? theme.palette.background.default : "#fff",
+              }}
+            >
+              <CardContent style={{ display: "flex", alignItems: "center" }}>
+                <Checkbox
+                  checked={t.completed}
+                  onChange={() => onToggle(t.id, !t.completed)}
+                  color="primary"
+                />
+                <Typography
+                  variant="body1"
+                  style={{
+                    textDecoration: t.completed ? "line-through" : "none",
+                    flexGrow: 1,
+                  }}
+                >
+                  {t.text}
+                </Typography>
+                <IconButton
+                  edge="end"
+                  color="secondary"
+                  onClick={() => onDelete(t.id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
+    </ThemeProvider>
   );
 }
+
 
 
 
